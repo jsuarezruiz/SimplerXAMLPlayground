@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimplerXAMLPlayground.Pages.MainPage"
+             x:DataType="MainPageModel"
+             x:Name="OverviewPage"
+             Title="{Binding Today}">
+
+    <ContentPage.Behaviors>
+        <EventToCommandBehavior
+                BindingContext="{Binding Path=BindingContext, Source={x:Reference OverviewPage}, x:DataType=ContentPage}"
+                EventName="NavigatedTo"
+                Command="{Binding NavigatedToCommand}" />
+        <EventToCommandBehavior
+                BindingContext="{Binding Path=BindingContext, Source={x:Reference OverviewPage}, x:DataType=ContentPage}"
+                EventName="NavigatedFrom"
+                Command="{Binding NavigatedFromCommand}" />
+        <EventToCommandBehavior
+                BindingContext="{Binding Path=BindingContext, Source={x:Reference OverviewPage}, x:DataType=ContentPage}"
+                EventName="Appearing"                
+                Command="{Binding AppearingCommand}" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <SfPullToRefresh
+            IsRefreshing="{Binding IsRefreshing}"
+            RefreshCommand="{Binding RefreshCommand}">
+            <SfPullToRefresh.PullableContent>
+                <ScrollView>
+                    <VerticalStackLayout Spacing="{StaticResource LayoutSpacing}" Padding="{StaticResource LayoutPadding}">
+                        <CategoryChart />
+                        <Label Text="Projects" Style="{StaticResource Title2}"/>
+                        <ScrollView Orientation="Horizontal" Margin="-30,0">
+                            <HorizontalStackLayout 
+                                Spacing="15" Padding="30,0"
+                                BindableLayout.ItemsSource="{Binding Projects}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="Project">
+                                        <ProjectCardView WidthRequest="200">
+                                            <ProjectCardView.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding NavigateToProjectCommand, Source={RelativeSource AncestorType={x:Type MainPageModel}}, x:DataType=MainPageModel}" CommandParameter="{Binding .}"/>
+                                            </ProjectCardView.GestureRecognizers>
+                                        </ProjectCardView>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
+                        <Grid HeightRequest="44">
+                            <Label Text="Tasks" Style="{StaticResource Title2}" VerticalOptions="Center"/>
+                            <ImageButton 
+                                Source="{StaticResource IconClean}"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"
+                                Aspect="Center"
+                                HeightRequest="44"
+                                WidthRequest="44"
+                                IsVisible="{Binding HasCompletedTasks}"
+                                Command="{Binding CleanTasksCommand}"
+                                SemanticProperties.Description="Clean tasks" />
+                        </Grid>
+                        <VerticalStackLayout Spacing="15"
+                            BindableLayout.ItemsSource="{Binding Tasks}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <TaskView TaskCompletedCommand="{Binding TaskCompletedCommand, Source={RelativeSource AncestorType={x:Type MainPageModel}}, x:DataType=MainPageModel}" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </ScrollView>
+            </SfPullToRefresh.PullableContent>
+        </SfPullToRefresh>
+
+        <AddButton 
+            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+            Command="{Binding AddTaskCommand}" />
+    </Grid>
+</ContentPage>

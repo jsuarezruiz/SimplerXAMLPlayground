@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimplerXAMLPlayground.Pages.ProjectListPage"
+             x:DataType="ProjectListPageModel"
+             Title="Projects">
+
+
+    <ContentPage.Behaviors>
+        <EventToCommandBehavior
+                EventName="Appearing"                
+                Command="{Binding AppearingCommand}" />
+    </ContentPage.Behaviors>
+    <Grid>
+      <ScrollView>
+        <VerticalStackLayout 
+            BindableLayout.ItemsSource="{Binding Projects}" 
+            Margin="{StaticResource LayoutPadding}" 
+            Spacing="{StaticResource LayoutSpacing}">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="Project">
+                    <Border>
+                        <VerticalStackLayout Padding="10">
+                            <Label Text="{Binding Name}" FontSize="24" />
+                            <Label Text="{Binding Description}" />
+                        </VerticalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToProjectCommand, Source={RelativeSource AncestorType={x:Type ProjectListPageModel}}, x:DataType=ProjectListPageModel}" CommandParameter="{Binding .}"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </VerticalStackLayout>
+      </ScrollView>
+
+        <AddButton 
+            Command="{Binding AddProjectCommand}" />
+    </Grid>
+</ContentPage>

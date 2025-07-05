@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimplerXAMLPlayground.Pages.ProjectDetailPage"
+             x:DataType="ProjectDetailPageModel"
+             Title="Project">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="NormalTagTemplate" x:DataType="Tag">
+                <Border StrokeShape="RoundRectangle 22" 
+                        HeightRequest="44" 
+                        StrokeThickness="0"
+                        Background="{AppThemeBinding Light={StaticResource LightSecondaryBackground},Dark={StaticResource DarkSecondaryBackground}}" 
+                        Padding="{OnPlatform '18,0,18,8',Android='18,0,18,0'}"
+                        SemanticProperties.Description="{Binding Title}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleTagCommand, Source={RelativeSource AncestorType={x:Type ProjectDetailPageModel}}, x:DataType=ProjectDetailPageModel}" CommandParameter="{Binding .}"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="{Binding Title}"
+                            TextColor="{AppThemeBinding Light={StaticResource DarkOnLightBackground},Dark={StaticResource LightOnDarkBackground}}"
+                            FontSize="{OnIdiom 16,Desktop=18}" 
+                            VerticalOptions="Center"
+                            VerticalTextAlignment="Center"/>
+                </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SelectedTagTemplate" x:DataType="Tag">
+            <Border StrokeShape="RoundRectangle 22" 
+                        HeightRequest="44" 
+                        StrokeThickness="0"
+                        Background="{Binding DisplayColor}" 
+                        Padding="{OnPlatform '18,0,18,8',Android='18,0,18,0'}"
+                        SemanticProperties.Description="{Binding Title}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleTagCommand, Source={RelativeSource AncestorType={x:Type ProjectDetailPageModel}}, x:DataType=ProjectDetailPageModel}" CommandParameter="{Binding .}"/>
+                </Border.GestureRecognizers>
+                <Label Text="{Binding Title}"
+                    TextColor="{AppThemeBinding Light={StaticResource LightBackground},Dark={StaticResource DarkBackground}}" 
+                    FontSize="{OnIdiom 16,Desktop=18}" 
+                    VerticalOptions="Center"
+                    VerticalTextAlignment="Center"/>
+            </Border>
+        </DataTemplate>
+
+        <ChipDataTemplateSelector 
+            x:Key="ChipDataTemplateSelector"
+            NormalTagTemplate="{StaticResource NormalTagTemplate}"
+            SelectedTagTemplate="{StaticResource SelectedTagTemplate}"/>
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Text="Delete"
+            Command="{Binding DeleteCommand}"
+            Order="Primary"
+            Priority="0"
+            IconImageSource="{StaticResource IconDelete}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource LayoutSpacing}">
+                <SfTextInputLayout 
+                    Hint="Name" >
+                    <Entry
+                        Text="{Binding Name}" />
+                </SfTextInputLayout>
+
+                <SfTextInputLayout 
+                    Hint="Description">
+                    <Entry
+                        Text="{Binding Description}" />
+                </SfTextInputLayout>
+
+                <SfTextInputLayout 
+                    Hint="Category">
+                    <Picker 
+                        ItemsSource="{Binding Categories}"
+                        SelectedItem="{Binding Category}"
+                        SelectedIndex="{Binding CategoryIndex}" />
+                </SfTextInputLayout>
+
+                <Label 
+                    Text="Icon" 
+                    Style="{StaticResource Title2}"/>
+                <CollectionView 
+                    HeightRequest="44" Margin="0,0,0,15"
+                    SelectionMode="Single"
+                    
+                    SelectedItem="{Binding Icon}"
+                    ItemsSource="{Binding Icons}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="IconData">
+                            <Grid RowDefinitions="Auto,4" RowSpacing="{StaticResource size60}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                                                <Setter TargetName="SelectedIndicator" Property="BoxView.IsVisible" Value="False"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Setter TargetName="SelectedIndicator" Property="BoxView.IsVisible" Value="True"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                
+                                <Label 
+                                    Text="{Binding Icon}" 
+                                    x:Name="IconImage"
+                                    FontFamily="{x:Static FluentUI.FontFamily}" 
+                                    FontSize="24" 
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="Center"
+                                    SemanticProperties.Description="{Binding Description}"
+                                    SemanticProperties.Hint="Icon representing the type of task . Tap to select"
+                                    TextColor="{AppThemeBinding Light={StaticResource DarkOnLightBackground},Dark={StaticResource LightOnDarkBackground}}"/>
+                                <BoxView x:Name="SelectedIndicator" Color="{StaticResource Primary}" HeightRequest="4" HorizontalOptions="Fill" Grid.Row="1"/>
+                            </Grid>                            
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="{StaticResource LayoutSpacing}"/>
+                    </CollectionView.ItemsLayout>
+                </CollectionView>
+                
+
+                <Label 
+                    Text="Tags" 
+                    Style="{StaticResource Title2}"/>
+                <ScrollView Orientation="Horizontal">
+                    <HorizontalStackLayout 
+                        Spacing="{StaticResource LayoutSpacing}" 
+                        HeightRequest="44" 
+                        Margin="0,0,0,15"
+                        BindableLayout.ItemsSource="{Binding AllTags}" 
+                        BindableLayout.ItemTemplateSelector="{StaticResource ChipDataTemplateSelector}"/>
+                </ScrollView>
+
+                <Button Text="Save" 
+                    HeightRequest="{OnIdiom 44, Desktop=60}"
+                    Command="{Binding SaveCommand}" />
+
+                <Grid HeightRequest="44">
+                    <Label 
+                        Text="Tasks" 
+                        Style="{StaticResource Title2}" 
+                        VerticalOptions="Center"/>
+                    <ImageButton 
+                        Source="{StaticResource IconClean}"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        Aspect="Center"
+                        HeightRequest="44"
+                        WidthRequest="44"
+                        IsVisible="{Binding HasCompletedTasks}"
+                        Command="{Binding CleanTasksCommand}"
+                        />
+                </Grid>
+                <VerticalStackLayout 
+                    Spacing="{StaticResource LayoutSpacing}"
+                    BindableLayout.ItemsSource="{Binding Tasks}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <TaskView TaskCompletedCommand="{Binding TaskCompletedCommand, Source={RelativeSource AncestorType={x:Type ProjectDetailPageModel}}, x:DataType=ProjectDetailPageModel}" />
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <AddButton Command="{Binding AddTaskCommand}" />
+    </Grid>
+    
+</ContentPage>
